@@ -1,44 +1,73 @@
--- Основной конфиг LunarVim
+-- Main LunarVim configuration
 lvim.log.level = "warn"
 lvim.format_on_save = true
 lvim.colorscheme = "gruvbox"
 
--- Shell
-vim.opt.shell = "/bin/zsh"
-vim.opt.shellcmdflag = "-c"
-vim.cmd [[
-    let &shellredir = '> %s 2>&1'
-    let &shellpipe = '2>&1 | tee %s'
-    set shellquote= shellxquote=
-]]
+-- Determine the operating system
+local os_name = vim.loop.os_uname().sysname
 
--- Настройка буфера обмена для macOS
-vim.g.clipboard = {
-  copy = {
-    ["+"] = "pbcopy",
-    ["*"] = "pbcopy",
-  },
-  paste = {
-    ["+"] = "pbpaste",
-    ["*"] = "pbpaste",
-  },
+if os_name == "Windows_NT" then
+  -- Settings for Windows
+  vim.opt.shell = "powershell.exe"
+  vim.opt.shellcmdflag = "-NoLogo -NoProfile -ExecutionPolicy RemoteSigned -Command"
+  vim.cmd [[
+      let &shellredir = '>%s 2>&1'
+      let &shellpipe = '2>&1 | tee %s'
+      set shellquote= shellxquote=
+  ]]
+elseif os_name == "Linux" or os_name == "Darwin" then
+  -- Settings for Linux and macOS
+  vim.opt.shell = "/bin/zsh"
+  vim.opt.shellcmdflag = "-c"
+  vim.cmd [[
+      let &shellredir = '> %s 2>&1'
+      let &shellpipe = '2>&1 | tee %s'
+      set shellquote= shellxquote=
+  ]]
+
+  if os_name == "Linux" then
+    -- Clipboard settings for Docker/Wayland
+    vim.g.clipboard = {
+      name = 'OSC 52',
+      copy = {
+        ['+'] = require('vim.ui.clipboard.osc52').copy('+'),
+        ['*'] = require('vim.ui.clipboard.osc52').copy('*'),
+      },
+      paste = {
+        ['+'] = require('vim.ui.clipboard.osc52').paste('+'),
+        ['*'] = require('vim.ui.clipboard.osc52').paste('*'),
+      },
 }
+  elseif os_name == "Darwin" then
+    -- Clipboard settings for macOS
+    vim.g.clipboard = {
+      copy = {
+        ["+"] = "pbcopy",
+        ["*"] = "pbcopy",
+      },
+      paste = {
+        ["+"] = "pbpaste",
+        ["*"] = "pbpaste",
+      },
+    }
+  end
+end
 
--- Настройки лидера
+-- Leader key settings
 lvim.leader = "space"
 
--- Tfeesitter конфигурация
+-- Treesitter configuration
 lvim.builtin.treesitter.highlight.enabled = true
 lvim.builtin.treesitter.ensure_installed = {
-  "javascript", -- Для JS
-  "dockerfile", -- Для Dockerfile
-  "lua",        -- Для Lua
-  "python",     -- Для Python
+  "javascript", -- For JavaScript
+  "dockerfile", -- For Dockerfile
+  "lua",        -- For Lua
+  "python",     -- For Python
 }
 
 local null_ls = require("null-ls")
 
--- Настройка null-ls
+-- Null-ls configuration
 local sources = {
   null_ls.builtins.formatting.prettier.with({
     filetypes = { "javascript", "typescript", "html", "css", "json" },
@@ -51,7 +80,7 @@ local sources = {
 
 null_ls.setup({ sources = sources })
 
--- Автоформатирование при сохранении
+-- Auto-formatting on save
 vim.api.nvim_create_autocmd("BufWritePre", {
   pattern = "*",
   callback = function()
@@ -59,7 +88,7 @@ vim.api.nvim_create_autocmd("BufWritePre", {
   end,
 })
 
--- Плагины
+-- Plugins
 lvim.plugins = {
   { "jose-elias-alvarez/null-ls.nvim" },
   { "nvim-treesitter/nvim-treesitter", build = ":TSUpdate" },
@@ -67,12 +96,12 @@ lvim.plugins = {
     "ggandor/lightspeed.nvim",
     event = "BufRead",
   },
-  {
-    "Pocco81/auto-save.nvim",
-    config = function()
-      require("auto-save").setup()
-    end,
-  },
+  -- {
+  --   "Pocco81/auto-save.nvim",
+  --   config = function()
+  --     require("auto-save").setup()
+  --   end,
+  -- },
   {
     "lunarvim/colorschemes"
   },
