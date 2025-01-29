@@ -37,7 +37,7 @@ elseif os_name == "Linux" or os_name == "Darwin" then
         ['+'] = require('vim.ui.clipboard.osc52').paste('+'),
         ['*'] = require('vim.ui.clipboard.osc52').paste('*'),
       },
-}
+    }
   elseif os_name == "Darwin" then
     -- Clipboard settings for macOS
     vim.g.clipboard = {
@@ -156,4 +156,20 @@ lvim.plugins = {
       })
     end
   },
+  -- Emmet
+  {
+    "mattn/emmet-vim",
+    ft = { "html", "css", "javascriptreact", "typescriptreact", "vue", "svelte" }, -- Автоматическая активация для этих типов файлов
+    config = function()
+      -- setup Emmet for Neovim
+      vim.g.user_emmet_mode = 'a'
+      vim.g.user_emmet_leader_key = ','
+      vim.g.user_emmet_install_global = 0
+
+      vim.cmd([[
+                autocmd FileType html,css,javascriptreact,typescriptreact,vue,svelte EmmetInstall
+            ]])
+    end,
+  },
+
 }
