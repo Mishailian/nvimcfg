@@ -78,7 +78,7 @@ local sources = {
   null_ls.builtins.formatting.stylua,
 }
 
-null_ls.setup({ sources = sources })
+null_ls.setup()
 
 -- Auto-formatting on save
 vim.api.nvim_create_autocmd("BufWritePre", {
@@ -139,23 +139,6 @@ lvim.plugins = {
       vim.api.nvim_command("augroup END")
     end
   },
-  {
-    "karb94/neoscroll.nvim",
-    event = "WinScrolled",
-    config = function()
-      require('neoscroll').setup({
-        mappings = { '<C-u>', '<C-d>', '<C-b>', '<C-f>', '<C-y>', '<C-e>', 'zt', 'zz', 'zb' },
-        hide_cursor = true,
-        stop_eof = true,
-        use_local_scrolloff = false,
-        respect_scrolloff = false,
-        cursor_scrolls_alone = true,
-        easing_function = nil,
-        pre_hook = nil,
-        post_hook = nil,
-      })
-    end
-  },
   -- Emmet
   {
     "mattn/emmet-vim",
@@ -176,10 +159,52 @@ lvim.plugins = {
     "iamcco/markdown-preview.nvim",
     cmd = { "MarkdownPreviewToggle", "MarkdownPreview", "MarkdownPreviewStop" },
     build = "cd app && yarn install",
+  },
+  -- Md viewer type ":MarkdownPreview"
+  {
+    "iamcco/markdown-preview.nvim",
+    cmd = { "MarkdownPreviewToggle", "MarkdownPreview", "MarkdownPreviewStop" },
+    build = "cd app && npm install",
     init = function()
       vim.g.mkdp_filetypes = { "markdown" }
     end,
     ft = { "markdown" },
+    config = function()
+      vim.g.mkdp_filetypes = { "markdown" }
+      vim.g.mkdp_auto_start = 1         -- Автоматический запуск предпросмотра при открытии файла markdown
+      vim.g.mkdp_auto_close = 1         -- Автоматическое закрытие предпросмотра при закрытии файла markdown
+      vim.g.mkdp_refresh_slow = 0       -- Отключение медленного обновления
+      vim.g.mkdp_command_for_global = 0 -- Запрещает использование глобальной команды
+      vim.g.mkdp_open_to_the_world = 0  -- Не открывать предпросмотр для всех (локально)
+      vim.g.mkdp_port = 8888            -- Порт для предпросмотра
+    end,
+  },
+  -- tailwindcss
+  -- tailwind-tools.lua
+  {
+    "luckasRanarison/tailwind-tools.nvim",
+    name = "tailwind-tools",
+    build = ":UpdateRemotePlugins",
+    dependencies = {
+      "nvim-treesitter/nvim-treesitter",
+      "nvim-telescope/telescope.nvim", -- optional
+      "neovim/nvim-lspconfig",         -- optional
+    },
+    opts = {}                          -- your configuration
+  },
+  --for code edit {} "" () etc
+  {
+    "tpope/vim-surround",
+    event = "VeryLazy",
   },
 
+  -- zen mode for activation :ZenMode
+  {
+    "folke/zen-mode.nvim",
+    opts = {
+      -- your configuration comes here
+      -- or leave it empty to use the default settings
+      -- refer to the configuration section below
+    }
+  }
 }
